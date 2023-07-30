@@ -7,6 +7,18 @@ const createNodeFile = document.querySelector(".create-note-image-file");
 let isModalOpen = false;
 let modelOpenContentId;
 let isCreatingPinnedNote = false;
+let isBackgroundPopupOpen = false;
+let backgroundPopupOpenId;
+
+const noteBackgroundColors = [
+  "faafa8",
+  "fff8b8",
+  "e2f6d3",
+  "b4ddd3",
+  "aeccdc",
+  "f6e2dd",
+  "efeff1",
+];
 
 displayNotes();
 
@@ -116,6 +128,22 @@ function deleteNote(noteId) {
   displayNotes();
 }
 
+function setNoteBGColor(backgroundColor) {
+  let notes = JSON.parse(window.localStorage.getItem("notes"));
+
+  for (let note of notes) {
+    if (note.id == backgroundPopupOpenId) {
+      note.backgroundColor = "#" + backgroundColor.toString(16);
+      break;
+    }
+  }
+
+  window.localStorage.setItem("notes", JSON.stringify(notes));
+
+  backgroundPopupOpenId = null;
+  displayNotes();
+}
+
 function closeModal() {
   modal.classList.remove("transition");
   modalBackground.style.display = "none";
@@ -147,7 +175,7 @@ function duplicateNote(noteId) {
 
 function togglePinCreatingNote() {
   isCreatingPinnedNote = !isCreatingPinnedNote;
-  creatingPin.style.color = isCreatingPinnedNote ? "black" : "grey";
+  creatingPin.style.color = isCreatingPinnedNote ? "black" : "#202124";
 }
 
 function togglePinNote(noteId) {
@@ -164,6 +192,35 @@ function togglePinNote(noteId) {
   window.localStorage.setItem("notes", JSON.stringify(notes));
 
   displayNotes();
+}
+
+function toggleBackgroundColorPopup(noteId) {
+  let backgroundColorPopups = document.querySelectorAll(".popup");
+  let currentNote = Array.from(backgroundColorPopups).find(
+    (popup) => popup.parentElement.getAttribute("id") == noteId
+  );
+
+  if (noteId != backgroundPopupOpenId) {
+    Array.from(backgroundColorPopups).forEach((popup) => {
+      popup.style.display = "none";
+    });
+    currentNote.style.display = "flex";
+    backgroundPopupOpenId = noteId;
+  } else {
+    currentNote.style.display = "none";
+    backgroundPopupOpenId = null;
+  }
+
+  let colorButtons = "";
+  for (let color of noteBackgroundColors) {
+    colorButtons += `<button class="color-btn" onClick="setNoteBGColor(${parseInt(
+      color,
+      16
+    )})" style='background-color:${"#" + color}'>
+    </button>`;
+  }
+
+  currentNote.querySelector(".background-color-popup").innerHTML = colorButtons;
 }
 
 function discardCreatingNote() {
@@ -207,14 +264,19 @@ function displayNotes() {
   const notes = JSON.parse(window.localStorage.getItem("notes"));
   let displayNoteArea = document.querySelector(".displayNoteArea");
   let displayPinnedNoteArea = document.querySelector(".displayPinnedNoteArea");
+
   displayNoteArea.innerHTML = "";
   displayPinnedNoteArea.innerHTML = ``;
+
   let pinnedNoteCount = 0;
+
   notes?.forEach((note) => {
     let isNoteContentNotHidden = note.title || note.description;
     let pinColor = note.isPinned ? "black" : "grey";
 
-    let newNoteNode = `<div class="note" id=${note.id} >
+    let newNoteNode = `<div class="note" id=${
+      note.id
+    } style='background-color:${note.backgroundColor}'>
      <button class="icon-btn pin" style='color:${pinColor}' onClick="togglePinNote(${
       note.id
     })"><i class="fa fa-thumb-tack"></i></button>  
@@ -229,12 +291,12 @@ function displayNotes() {
             <div class="note-content" style='display:${
               !isNoteContentNotHidden ? "none" : "inherit"
             }'>
-            <div class="editable note-title line-clamp-properties-2" tabindex="0" data-placeholder="Title"><pre>${
-              note.title
-            }</pre></div>
-    <div class="editable note-description line-clamp-properties-7" tabindex="0" data-placeholder="Note description.."><pre>${
-      note.description
-    }</pre></div>
+                <div class="editable note-title line-clamp-properties-2" tabindex="0" data-placeholder="Title"><pre>${
+                  note.title
+                }</pre></div>
+                <div class="editable note-description line-clamp-properties-7" tabindex="0" data-placeholder="Note description.."><pre>${
+                  note.description
+                }</pre></div>
             </div>
         </div>
         <div class="notes-options-container">
@@ -251,12 +313,19 @@ function displayNotes() {
                         }" class='icon-btn'><i class="fa fa-image"></i></label>
                         <button class="icon-btn" onClick="duplicateNote(${
                           note.id
-                        })"><i class="fa fa-copy"></i></button>          
+                        })"><i class="fa fa-copy"></i></button>    
+                        <button class="icon-btn" onClick="toggleBackgroundColorPopup(${
+                          note.id
+                        })"><i class="fa-solid fa-palette"></i></button>       
                     </div>
                     <button class="saveButton" onClick='saveNote(${
                       note.id
                     })'>Save</button>    
                 </div>
+        </div>
+        <div class="popup">
+            <div class="background-color-popup">
+            </div>
         </div>
         </div>
         `;
@@ -326,6 +395,7 @@ function noteClickHandler() {
       modelOpenContentId = nodeId;
 
       modal.innerHTML = node.parentElement.innerHTML;
+      modal.style.backgroundColor = node.parentElement.style.backgroundColor;
       modal.querySelector(".saveButton").style.display = "inherit";
       modal.querySelector(".note-content").style.display = "inherit";
 
