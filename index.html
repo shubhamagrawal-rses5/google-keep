@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google keep</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="main-container">
+      <div class="createNoteArea">
+        <div class="create-note-image">
+       
+        </div>
+        <div
+          class="editable create-title"
+          contenteditable="true"
+          data-placeholder="Title"
+        ></div>
+        <div
+          class="editable create-description"
+          contenteditable="true"
+          data-placeholder="Take a note..."
+        ></div>
+        <div class="create-options-container">
+          <div class="create-note-options">
+            <div class="note-actions">
+                <button class="icon-btn" onClick="discardCreatingNote()"><i class="fa fa-trash"></i></button>
+                <input type='file' accept="image/*" class="create-note-image-file" id="create-note-image-file" hidden></input>
+                <label for="create-note-image-file" class='icon-btn'><i class="fa fa-image"></i></label>  
+                <button class="icon-btn" id="creating-pin"><i class="fa fa-thumb-tack"></i></button>  
+            </div>
+            <button class="saveButton" font awesome>Save</button>
+          </div>
+        </div>
+      </div>
+      <div class="headings">Pinned</div>
+      <div class="displayPinnedNoteArea"></div>
+      <div class="headings">Others</div>
+      <div class="displayNoteArea"></div>
+    </div>
+    <div class="note-modal-background"></div>
+    <div class="editable-note-modal"></div>
+    <script src="./index.js"></script>
+  </body>
+</html>
