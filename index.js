@@ -53,7 +53,8 @@ function createNote(
   createNodeTitle,
   createNodeDescription,
   createNodeImage,
-  iscreateNodePinned = false
+  iscreateNodePinned = false,
+  backgroundColor = "white"
 ) {
   if (createNodeTitle || createNodeDescription || createNodeImage) {
     let notesCount = JSON.parse(window.localStorage.getItem("notesCount")) ?? 0;
@@ -66,6 +67,7 @@ function createNote(
       description: createNodeDescription,
       imageURL: createNodeImage,
       isPinned: iscreateNodePinned,
+      backgroundColor: backgroundColor,
     };
 
     let notes = JSON.parse(window.localStorage.getItem("notes"));
@@ -169,7 +171,8 @@ function duplicateNote(noteId) {
     currentNote.title,
     currentNote.description,
     currentNote.imageURL,
-    currentNote.isPinned
+    currentNote.isPinned,
+    currentNote.backgroundColor
   );
 }
 
