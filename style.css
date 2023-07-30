@@ -107,7 +107,6 @@ body {
 
 .displayNoteArea,
 .displayPinnedNoteArea {
-  border: 1px solid red;
   flex: 1;
   gap: 1rem;
   padding: 1rem;
