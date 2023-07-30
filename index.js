@@ -164,18 +164,6 @@ function togglePinNote(noteId) {
   window.localStorage.setItem("notes", JSON.stringify(notes));
 
   displayNotes();
-
-  //   let pinnedNotesCount =
-  //     JSON.parse(window.localStorage.getItem("pinnedNotesCount")) ?? 0;
-  //   let pinnedNotes = JSON.parse(window.localStorage.getItem("pinnedNotes"));
-  //   if (pinnedNotes) {
-  //     pinnedNotes.push(currentNote);
-  //   } else {
-  //     pinnedNotes = [currentNote];
-  //   }
-
-  //   window.localStorage.setItem("pinnedNotes", JSON.stringify(pinnedNotes));
-  //   window.localStorage.setItem("pinnedNotesCount", pinnedNotesCount + 1);
 }
 
 function discardCreatingNote() {
@@ -220,13 +208,11 @@ function displayNotes() {
   let displayNoteArea = document.querySelector(".displayNoteArea");
   let displayPinnedNoteArea = document.querySelector(".displayPinnedNoteArea");
   displayNoteArea.innerHTML = "";
-  displayPinnedNoteArea.innerHTML = "";
+  displayPinnedNoteArea.innerHTML = ``;
   let pinnedNoteCount = 0;
   notes?.forEach((note) => {
     let isNoteContentNotHidden = note.title || note.description;
     let pinColor = note.isPinned ? "black" : "grey";
-
-    // let pinVisibility = note.isPinned ? "visible" : "hidden";
 
     let newNoteNode = `<div class="note" id=${note.id} >
      <button class="icon-btn pin" style='color:${pinColor}' onClick="togglePinNote(${
