@@ -50,6 +50,9 @@ creatingBackgroundColor.addEventListener("click", () => {
       color,
       16
     )})" style='background-color:${"#" + color}'>
+     ${
+       creatingBGColor == "#" + color ? '<i class="fa-solid fa-check"></i>' : ""
+     }
     </button>`;
   }
 
@@ -233,14 +236,14 @@ function togglePinCreatingNote() {
 
 function setNoteBGColor(backgroundColor) {
   let notes = JSON.parse(window.localStorage.getItem("notes"));
-
+  let currentBGColor;
   for (let note of notes) {
     if (note.id == backgroundPopupOpenId) {
       note.backgroundColor = "#" + backgroundColor.toString(16);
+      currentBGColor = "#" + backgroundColor.toString(16);
       break;
     }
   }
-  console.log(backgroundPopupOpenId, backgroundColor);
 
   window.localStorage.setItem("notes", JSON.stringify(notes));
 
@@ -270,7 +273,7 @@ function test() {
   console.log("test");
 }
 
-function generateBGColorPopup() {
+function generateBGColorPopup(noteId) {
   let popup = document.createElement("div");
   popup.classList.add("popup");
   let backgroundColorPopup = document.createElement("div");
@@ -278,12 +281,20 @@ function generateBGColorPopup() {
 
   popup.appendChild(backgroundColorPopup);
 
+  let notes = JSON.parse(window.localStorage.getItem("notes"));
+  currentNote = notes.find((note) => note.id == noteId);
+
   let colorButtons = "";
   for (let color of noteBackgroundColors) {
     colorButtons += `<button class="color-btn" onClick="setNoteBGColor(${parseInt(
       color,
       16
     )})" style='background-color:${"#" + color}'>
+   ${
+     currentNote.backgroundColor == "#" + color
+       ? '<i class="fa-solid fa-check"></i>'
+       : ""
+   }
     </button>`;
   }
 
@@ -293,9 +304,16 @@ function generateBGColorPopup() {
 }
 
 function toggleBackgroundColorPopup(noteId) {
-  let popup = generateBGColorPopup();
+  let popup = generateBGColorPopup(noteId);
 
   let noteNodes = document.querySelectorAll(".note-content-container");
+
+  let allPopups = document.querySelectorAll(".popup");
+
+  Array.from(allPopups).forEach((popup) => {
+    popup.remove();
+  });
+
   let currentNote = Array.from(noteNodes).find(
     (node) => node.parentElement.getAttribute("id") == noteId
   );
@@ -487,7 +505,18 @@ window.addEventListener("click", (event) => {
     if (isCreatingPinnedNote) togglePinCreatingNote();
     isCreatingBGColorPopupOpen = false;
     createNoteArea.style.backgroundColor = "white";
-    createNodeBGColor = "white";
+    creatingBGColor = "white";
+  }
+  let popup = document.querySelector(".popup");
+  let popupParent = popup?.parentElement;
+  if (
+    document.contains(event.target) &&
+    popup &&
+    !popupParent.contains(event.target) &&
+    backgroundPopupOpenId
+  ) {
+    backgroundPopupOpenId = null;
+    document.querySelector(".popup").remove();
   }
 });
 

@@ -351,10 +351,14 @@ pre {
   width: 26px;
   border-radius: 13px;
   margin: 4px;
-  color: grey;
+  color: blue;
   cursor: pointer;
   border: 1px solid rgb(217, 215, 215);
 }
 .color-btn:hover {
-  border: 1px solid blue;
+  border: 1px solid black;
+}
+
+.color-btn:focus {
+  border: 2px solid blue;
 }
