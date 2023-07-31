@@ -3,14 +3,17 @@ const modal = document.querySelector(".editable-note-modal");
 const modalBackground = document.querySelector(".note-modal-background");
 const mainContainer = document.querySelector(".main-container");
 const createNodeFile = document.querySelector(".create-note-image-file");
+const createNodeBGColor = document.querySelector(".creating-background-color");
 
 let isModalOpen = false;
 let modelOpenContentId;
 let isCreatingPinnedNote = false;
-let isBackgroundPopupOpen = false;
 let backgroundPopupOpenId;
+let isCreatingBGColorPopupOpen = false;
+let creatingBGColor;
 
 const noteBackgroundColors = [
+  "ffffff",
   "faafa8",
   "fff8b8",
   "e2f6d3",
@@ -34,6 +37,34 @@ createNoteArea.addEventListener("click", () => {
     ".create-options-container"
   );
   createNodeOptionsContainer.style.display = "block";
+});
+
+const creatingBackgroundColor = document.querySelector(
+  "#creating-background-color"
+);
+
+creatingBackgroundColor.addEventListener("click", () => {
+  let colorButtons = "";
+  for (let color of noteBackgroundColors) {
+    colorButtons += `<button class="color-btn" onClick="setCreatingNoteBGColor(${parseInt(
+      color,
+      16
+    )})" style='background-color:${"#" + color}'>
+    </button>`;
+  }
+
+  let creatingBackgroundColor = document.querySelector(
+    ".creating-background-color"
+  );
+  creatingBackgroundColor.children[0].innerHTML = colorButtons;
+
+  if (isCreatingBGColorPopupOpen) {
+    isCreatingBGColorPopupOpen = false;
+    creatingBackgroundColor.style.display = "none";
+  } else {
+    isCreatingBGColorPopupOpen = true;
+    creatingBackgroundColor.style.display = "flex";
+  }
 });
 
 createNodeFile.addEventListener("change", (event) => {
@@ -85,7 +116,7 @@ function createNote(
   }
 }
 
-function updateNote(noteId) {
+function updateNoteContent(noteId) {
   let notes = JSON.parse(window.localStorage.getItem("notes"));
   let node = document.querySelector(".editable-note-modal");
 
@@ -130,40 +161,6 @@ function deleteNote(noteId) {
   displayNotes();
 }
 
-function setNoteBGColor(backgroundColor) {
-  let notes = JSON.parse(window.localStorage.getItem("notes"));
-
-  for (let note of notes) {
-    if (note.id == backgroundPopupOpenId) {
-      note.backgroundColor = "#" + backgroundColor.toString(16);
-      break;
-    }
-  }
-
-  window.localStorage.setItem("notes", JSON.stringify(notes));
-
-  backgroundPopupOpenId = null;
-  displayNotes();
-}
-
-function closeModal() {
-  modal.classList.remove("transition");
-  modalBackground.style.display = "none";
-  isModalOpen = false;
-  modelOpenContentId = null;
-}
-
-function openModal() {
-  modal.classList.add("transition");
-  modalBackground.style.display = "inherit";
-  isModalOpen = true;
-}
-
-function saveNote(noteId) {
-  updateNote(noteId);
-  closeModal();
-}
-
 function duplicateNote(noteId) {
   let notes = JSON.parse(window.localStorage.getItem("notes"));
   currentNote = notes.find((note) => note.id == noteId);
@@ -176,14 +173,8 @@ function duplicateNote(noteId) {
   );
 }
 
-function togglePinCreatingNote() {
-  isCreatingPinnedNote = !isCreatingPinnedNote;
-  creatingPin.style.color = isCreatingPinnedNote ? "black" : "#202124";
-}
-
 function togglePinNote(noteId) {
   let notes = JSON.parse(window.localStorage.getItem("notes"));
-  //   currentNote = notes.find((note) => note.id == noteId);
 
   for (let note of notes) {
     if (note.id == noteId) {
@@ -195,49 +186,6 @@ function togglePinNote(noteId) {
   window.localStorage.setItem("notes", JSON.stringify(notes));
 
   displayNotes();
-}
-
-function toggleBackgroundColorPopup(noteId) {
-  let backgroundColorPopups = document.querySelectorAll(".popup");
-  let currentNote = Array.from(backgroundColorPopups).find(
-    (popup) => popup.parentElement.getAttribute("id") == noteId
-  );
-
-  if (noteId != backgroundPopupOpenId) {
-    Array.from(backgroundColorPopups).forEach((popup) => {
-      popup.style.display = "none";
-    });
-    currentNote.style.display = "flex";
-    backgroundPopupOpenId = noteId;
-  } else {
-    currentNote.style.display = "none";
-    backgroundPopupOpenId = null;
-  }
-
-  let colorButtons = "";
-  for (let color of noteBackgroundColors) {
-    colorButtons += `<button class="color-btn" onClick="setNoteBGColor(${parseInt(
-      color,
-      16
-    )})" style='background-color:${"#" + color}'>
-    </button>`;
-  }
-
-  currentNote.querySelector(".background-color-popup").innerHTML = colorButtons;
-}
-
-function discardCreatingNote() {
-  let createNodeTitle = document.querySelector(".create-title");
-  let createNodeDescription = document.querySelector(".create-description");
-  let createNodeImage = document.querySelector(".create-note-image");
-
-  createNodeTitle.innerHTML = "";
-  createNodeDescription.innerHTML = "";
-  createNodeImage.innerHTML = "";
-}
-
-function test() {
-  console.log("test");
 }
 
 function addImage(nodeId) {
@@ -261,6 +209,106 @@ function addImage(nodeId) {
 
   window.localStorage.setItem("notes", JSON.stringify(notes));
   displayNotes();
+}
+
+function setCreatingNoteBGColor(bgColor = "white") {
+  creatingBGColor = "#" + bgColor.toString(16);
+  createNoteArea.style.backgroundColor = creatingBGColor;
+}
+
+function discardCreatingNote() {
+  let createNodeTitle = document.querySelector(".create-title");
+  let createNodeDescription = document.querySelector(".create-description");
+  let createNodeImage = document.querySelector(".create-note-image");
+
+  createNodeTitle.innerHTML = "";
+  createNodeDescription.innerHTML = "";
+  createNodeImage.innerHTML = "";
+}
+
+function togglePinCreatingNote() {
+  isCreatingPinnedNote = !isCreatingPinnedNote;
+  creatingPin.style.color = isCreatingPinnedNote ? "black" : "grey";
+}
+
+function setNoteBGColor(backgroundColor) {
+  let notes = JSON.parse(window.localStorage.getItem("notes"));
+
+  for (let note of notes) {
+    if (note.id == backgroundPopupOpenId) {
+      note.backgroundColor = "#" + backgroundColor.toString(16);
+      break;
+    }
+  }
+  console.log(backgroundPopupOpenId, backgroundColor);
+
+  window.localStorage.setItem("notes", JSON.stringify(notes));
+
+  backgroundPopupOpenId = null;
+  displayNotes();
+}
+
+function closeModal() {
+  modal.classList.remove("transition");
+  modalBackground.style.display = "none";
+  isModalOpen = false;
+  modelOpenContentId = null;
+}
+
+function openModal() {
+  modal.classList.add("transition");
+  modalBackground.style.display = "inherit";
+  isModalOpen = true;
+}
+
+function saveNote(noteId) {
+  updateNoteContent(noteId);
+  closeModal();
+}
+
+function test() {
+  console.log("test");
+}
+
+function generateBGColorPopup() {
+  let popup = document.createElement("div");
+  popup.classList.add("popup");
+  let backgroundColorPopup = document.createElement("div");
+  backgroundColorPopup.classList.add("background-color-popup");
+
+  popup.appendChild(backgroundColorPopup);
+
+  let colorButtons = "";
+  for (let color of noteBackgroundColors) {
+    colorButtons += `<button class="color-btn" onClick="setNoteBGColor(${parseInt(
+      color,
+      16
+    )})" style='background-color:${"#" + color}'>
+    </button>`;
+  }
+
+  backgroundColorPopup.innerHTML = colorButtons;
+
+  return popup;
+}
+
+function toggleBackgroundColorPopup(noteId) {
+  let popup = generateBGColorPopup();
+
+  let noteNodes = document.querySelectorAll(".note-content-container");
+  let currentNote = Array.from(noteNodes).find(
+    (node) => node.parentElement.getAttribute("id") == noteId
+  );
+
+  currentNote.parentNode.appendChild(popup);
+
+  if (noteId != backgroundPopupOpenId) {
+    popup.style.display = "flex";
+    backgroundPopupOpenId = noteId;
+  } else {
+    popup.style.display = "none";
+    backgroundPopupOpenId = null;
+  }
 }
 
 function displayNotes() {
@@ -325,10 +373,6 @@ function displayNotes() {
                       note.id
                     })'>Save</button>    
                 </div>
-        </div>
-        <div class="popup">
-            <div class="background-color-popup">
-            </div>
         </div>
         </div>
         `;
@@ -398,7 +442,9 @@ function noteClickHandler() {
       modelOpenContentId = nodeId;
 
       modal.innerHTML = node.parentElement.innerHTML;
+
       modal.style.backgroundColor = node.parentElement.style.backgroundColor;
+
       modal.querySelector(".saveButton").style.display = "inherit";
       modal.querySelector(".note-content").style.display = "inherit";
 
@@ -430,13 +476,18 @@ window.addEventListener("click", (event) => {
       createNodeTitle.innerText,
       createNodeDescription.innerText,
       createNodeImage.children[0]?.src,
-      isCreatingPinnedNote
+      isCreatingPinnedNote,
+      creatingBGColor
     );
     createNodeTitle.style.display = "none";
     createNodeTitle.innerHTML = "";
     createNodeDescription.innerHTML = "";
     createNodeImage.innerHTML = "";
+    createNodeBGColor.style.display = "none";
     if (isCreatingPinnedNote) togglePinCreatingNote();
+    isCreatingBGColorPopupOpen = false;
+    createNoteArea.style.backgroundColor = "white";
+    createNodeBGColor = "white";
   }
 });
 

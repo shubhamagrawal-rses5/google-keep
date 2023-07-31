@@ -30,9 +30,10 @@ body {
 .createNoteArea {
   margin: 1rem 0;
   box-sizing: border-box;
+  position: relative;
   border: solid transparent;
   border-radius: 8px;
-  overflow: hidden;
+  /* overflow: hidden; */
   padding: 0.5rem;
   width: 600px;
   box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302),
@@ -231,7 +232,7 @@ pre {
   width: 26px;
   border-radius: 13px;
   margin: 0 4px 0 0;
-  color: #202124;
+  color: grey;
   font-size: 16px;
   cursor: pointer;
 }
@@ -306,10 +307,28 @@ pre {
   box-sizing: border-box;
   overflow: hidden;
   bottom: -2.2rem;
-  left: 0;
+  left: 50%;
   right: 0;
+  transform: translateX(-50%);
+  width: max-content;
   display: none;
   margin: auto;
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.302),
+    0 1px 3px 1px rgba(60, 64, 67, 0.149);
+}
+
+.creating-background-color {
+  position: absolute;
+  box-sizing: border-box;
+  overflow: hidden;
+  bottom: -2.2rem;
+  left: 0;
+  right: 0;
+  width: max-content;
+  display: none;
   background-color: white;
   border-radius: 12px;
   border: 1px solid transparent;
@@ -334,6 +353,7 @@ pre {
   margin: 4px;
   color: grey;
   cursor: pointer;
+  border: 1px solid rgb(217, 215, 215);
 }
 .color-btn:hover {
   border: 1px solid blue;
